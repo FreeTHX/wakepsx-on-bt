@@ -1,0 +1,140 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Wake PSX on Bluetooth - Étape 1",
+        "description": "Veuillez connecter votre manette PlayStation (DualShock/DualSense) au serveur Home Assistant via USB, puis cliquez sur Valider pour extraire les adresses MAC.\n\n{status}",
+        "data": {}
+      },
+      "select_controller": {
+        "title": "Wake PSX on Bluetooth — Sélection de la manette",
+        "description": "**{count} manettes PlayStation détectées.** Sélectionnez celle que vous souhaitez configurer.",
+        "data": {
+          "selected_controller": "Manette"
+        }
+      },
+      "select_wake_method": {
+        "title": "Wake PSX on Bluetooth - Étape 2",
+        "description": "Détecté : **ESPHome** — {esp_summary} | **Bluetooth** — {adapter_summary}\n\nChoisissez la méthode de réveil pour cette console.",
+        "data": {
+          "console_name": "Nom de la console",
+          "wake_method": "Méthode de réveil"
+        }
+      },
+      "select_esp": {
+        "title": "Wake PSX on Bluetooth - Étape 3 (ESPHome)",
+        "description": "Sélectionnez le nœud ESPHome qui sera utilisé pour envoyer la commande Bluetooth à cette console.",
+        "data": {
+          "wakepsx_on_bt_entity": "Nœud ESPHome"
+        }
+      },
+      "select_esp_warning": {
+        "title": "Wake PSX on Bluetooth - Étape 3 (ESPHome)",
+        "description": "⚠️ **Attention : Aucun nœud ESPHome compatible trouvé.**\n\nVous pouvez laisser ce champ vide pour terminer l'installation et lier le nœud plus tard via le menu Configurer.",
+        "data": {
+          "wakepsx_on_bt_entity": "Nœud ESPHome (Optionnel)"
+        }
+      },
+      "select_dongle": {
+        "title": "Wake PSX on Bluetooth - Étape 3 (Dongle Bluetooth)",
+        "description": "Sélectionnez un adaptateur Bluetooth local compatible qui enverra directement les paquets de réveil.",
+        "data": {
+          "bt_adapter": "Adaptateur Bluetooth"
+        }
+      },
+      "select_dongle_warning": {
+        "title": "Wake PSX on Bluetooth - Étape 3 (Dongle Bluetooth)",
+        "description": "⚠️ **Attention : Aucun adaptateur compatible n'a pu être détecté automatiquement.**\n\nEntrez l'adaptateur manuellement au format `hciX` (exemple : `hci0`).",
+        "data": {
+          "bt_adapter": "Adaptateur Bluetooth"
+        }
+      },
+      "select_csr_write_mode": {
+        "title": "Wake PSX on Bluetooth - Étape 4 (Dongle CSR)",
+        "description": "Adaptateur CSR détecté. Choisissez comment l'adresse BD_ADDR est écrite avant chaque commande de réveil.\n\n- **Transient (recommandé) :** écrit en RAM uniquement. Le logiciel restaure toujours l'adresse d'origine après utilisation. En cas de crash, un simple débranchement/rebranchement du dongle rétablit automatiquement l'adresse correcte.\n- **Persistent :** écrit dans la flash. Le logiciel restaure également après utilisation, mais en cas de crash, la flash conserve la mauvaise adresse jusqu'à la prochaine exécution.",
+        "data": {
+          "csr_write_mode": "Mode d'écriture CSR"
+        }
+      }
+    },
+    "error": {
+      "no_controller": "Aucune manette PlayStation compatible détectée en USB. Veuillez la rebrancher et réessayer.",
+      "extraction_error": "Une erreur s'est produite lors de la lecture du périphérique USB. Consultez les journaux (logs).",
+      "invalid_wake_method": "Méthode de réveil invalide.",
+      "invalid_adapter": "Format d'adaptateur Bluetooth invalide. Utilisez hciX (exemple : hci0).",
+      "adapter_already_configured": "L'adaptateur Bluetooth sélectionné est déjà configuré pour une autre console.",
+      "adapter_not_found": "L'adaptateur Bluetooth sélectionné n'a pas été détecté sur ce système.",
+      "detection_error": "Impossible de détecter la stratégie de l'adaptateur. Vérifiez que l'adaptateur est connecté et que Home Assistant a accès aux périphériques Bluetooth.",
+      "no_esphome_found": "Aucun nœud ESPHome compatible trouvé. Vérifiez qu'un nœud avec le firmware WakePSX est en ligne et accessible depuis Home Assistant.",
+      "no_adapter_found": "Aucun adaptateur Bluetooth détecté sur ce système. Veuillez connecter un dongle Bluetooth USB et réessayer."
+    },
+    "abort": {
+      "already_configured": "Cette console est déjà configurée.",
+      "extraction_error": "Une erreur interne s'est produite pendant la configuration. Veuillez relancer la procédure.",
+      "reconfigure_successful": "La configuration de la console a été mise à jour avec succès."
+    }
+  },
+  "selector": {
+    "wake_method": {
+      "options": {
+        "esphome_psx_waker": "ESPHome (Recommandé)",
+        "bluetooth_dongle": "Dongle Bluetooth"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Reconfigurer la méthode de réveil",
+        "description": "Détecté : **ESPHome** — {esp_summary} | **Bluetooth** — {adapter_summary}\n\nSélectionnez la méthode de réveil à utiliser pour cette console.",
+        "data": {
+          "wake_method": "Méthode de réveil"
+        }
+      },
+      "init_esphome": {
+        "title": "Reconfigurer le nœud ESP",
+        "description": "Sélectionnez le nœud ESPHome utilisé pour les commandes de réveil.",
+        "data": {
+          "wakepsx_on_bt_entity": "Nœud ESPHome"
+        }
+      },
+      "init_esphome_warning": {
+        "title": "Reconfigurer le nœud ESP",
+        "description": "⚠️ **Attention : Aucun nœud ESPHome compatible trouvé.**\n\nVous pouvez laisser ce champ vide pour terminer la configuration et lier le nœud plus tard via le menu Configurer.",
+        "data": {
+          "wakepsx_on_bt_entity": "Nœud ESPHome (Optionnel)"
+        }
+      },
+      "init_dongle": {
+        "title": "Reconfigurer le dongle Bluetooth",
+        "description": "Sélectionnez l'adaptateur Bluetooth local utilisé pour les commandes de réveil direct.",
+        "data": {
+          "bt_adapter": "Adaptateur Bluetooth"
+        }
+      },
+      "init_dongle_warning": {
+        "title": "Reconfigurer le dongle Bluetooth",
+        "description": "⚠️ **Attention : Aucun adaptateur compatible n'a pu être détecté automatiquement.**\n\nEntrez l'adaptateur manuellement au format `hciX` (exemple : `hci0`).",
+        "data": {
+          "bt_adapter": "Adaptateur Bluetooth"
+        }
+      },
+      "init_csr_write_mode": {
+        "title": "Reconfigurer le mode d'écriture CSR",
+        "description": "Choisissez comment l'adaptateur CSR écrit l'adresse BD_ADDR avant chaque commande de réveil.\n\n- **Transient (recommandé) :** écrit en RAM uniquement. Le logiciel restaure toujours l'adresse d'origine après utilisation. En cas de crash, un simple débranchement/rebranchement du dongle rétablit automatiquement l'adresse correcte.\n- **Persistent :** écrit dans la flash. Le logiciel restaure également après utilisation, mais en cas de crash, la flash conserve la mauvaise adresse jusqu'à la prochaine exécution.",
+        "data": {
+          "csr_write_mode": "Mode d'écriture CSR"
+        }
+      }
+    },
+    "error": {
+      "invalid_wake_method": "Méthode de réveil invalide.",
+      "invalid_adapter": "Format d'adaptateur Bluetooth invalide. Utilisez hciX (exemple : hci0).",
+      "adapter_already_configured": "L'adaptateur Bluetooth sélectionné est déjà configuré pour une autre console.",
+      "adapter_not_found": "L'adaptateur Bluetooth sélectionné n'a pas été détecté sur ce système.",
+      "detection_error": "Impossible de détecter la stratégie de l'adaptateur. Vérifiez que l'adaptateur est connecté et que Home Assistant a accès aux périphériques Bluetooth.",
+      "no_esphome_found": "Aucun nœud ESPHome compatible trouvé. Vérifiez qu'un nœud avec le firmware WakePSX est en ligne et accessible depuis Home Assistant.",
+      "no_adapter_found": "Aucun adaptateur Bluetooth détecté sur ce système. Veuillez connecter un dongle Bluetooth USB et réessayer."
+    }
+  }
+}

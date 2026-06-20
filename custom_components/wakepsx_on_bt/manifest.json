@@ -1,0 +1,20 @@
+{
+  "domain": "wakepsx_on_bt",
+  "name": "Wake PSX on Bluetooth",
+  "codeowners": ["@FreeTHX"],
+  "version": "0.1.0",
+  "documentation": "https://github.com/FreeTHX/wakepsx-on-bt",
+  "issue_tracker": "https://github.com/FreeTHX/wakepsx-on-bt/issues",
+  "after_dependencies": ["esphome"],
+  "requirements": ["pywakepsx-on-bt"],
+  "config_flow": true,
+  "iot_class": "local_push",
+  "integration_type": "device",
+  "usb": [
+    {"vid": "054C", "pid": "0268"},
+    {"vid": "054C", "pid": "05C4"},
+    {"vid": "054C", "pid": "09CC"},
+    {"vid": "054C", "pid": "0CE6"},
+    {"vid": "054C", "pid": "0DF2"}
+  ]
+}

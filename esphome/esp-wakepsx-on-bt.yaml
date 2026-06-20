@@ -1,0 +1,63 @@
+# ==============================================================================
+# Project: esp-wakepsx-on-bt
+# Author: FreeTHX
+# Description: ESPHome configuration for waking PlayStation consoles via Bluetooth.
+# Requirements: Classic ESP32 (WROOM/WROVER). Do not use S2/S3/C3 (No Classic BT).
+# ==============================================================================
+esphome:
+  name: esp-wakepsx-on-bt
+  friendly_name: Wake PSX on Bluetooth
+  project:
+    name: "freethx.esp-wakepsx-on-bt"
+    version: "0.1.0"
+  includes:
+    - wake_psx_vhci.h
+  # Set status to Ready before API connects so HA never sees "unknown" on boot
+  on_boot:
+    priority: 600
+    then:
+      - text_sensor.template.publish:
+          id: psx_wake_status
+          state: "Ready"
+
+
+packages:
+  wifi: !include ../../common/wifi.yaml
+
+ota:
+  - platform: esphome
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+    version: recommended
+    # Core optimization: We disable high-level Bluetooth stacks (Bluedroid/NimBLE)
+    # to free up RAM and allow raw Virtual HCI (VHCI) injection.
+    sdkconfig_options:
+      CONFIG_BT_ENABLED: "y"
+      CONFIG_BT_CLASSIC_ENABLED: "y"
+      CONFIG_BT_CONTROLLER_ONLY: "y"
+      CONFIG_BT_BLUEDROID_ENABLED: "n"
+      CONFIG_BT_NIMBLE_ENABLED: "n"
+      CONFIG_BT_HCI_MODE_VHCI: "y"
+      CONFIG_BTDM_CTRL_MODE_BR_EDR_ONLY: "y"
+
+# This sensor acts as the dynamic feedback link for Home Assistant's UI
+text_sensor:
+  - platform: template
+    id: psx_wake_status
+    name: "PSX Wake Status"
+    update_interval: never
+    icon: "mdi:sony-playstation"
+
+# Define the service accessible by Home Assistant
+api:
+  actions:
+    - action: wake_psx
+      variables:
+        dsx_mac: string # Spoofed Controller MAC
+        psx_mac: string # Target PlayStation MAC
+      then:
+        - lambda: |-
+            wakepsx_on_bt::wake_psx(dsx_mac, psx_mac, id(psx_wake_status));

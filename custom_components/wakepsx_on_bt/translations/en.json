@@ -1,0 +1,131 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Wake PSX on Bluetooth - Step 1",
+        "description": "Please connect your PlayStation controller (DualShock/DualSense) to the Home Assistant server via USB, then click Submit to extract the MAC addresses.\n\n{status}",
+        "data": {}
+      },
+      "select_controller": {
+        "title": "Wake PSX on Bluetooth — Controller Selection",
+        "description": "**{count} PlayStation controllers detected.** Select the one you want to configure.",
+        "data": {
+          "selected_controller": "Controller"
+        }
+      },
+      "select_wake_method": {
+        "title": "Wake PSX on Bluetooth - Step 2",
+        "description": "Detected: **ESPHome** — {esp_summary} | **Bluetooth** — {adapter_summary}\n\nChoose how this console should be woken up.",
+        "data": {
+          "console_name": "Console Name",
+          "wake_method": "Wake Method"
+        }
+      },
+      "select_esp": {
+        "title": "Wake PSX on Bluetooth - Step 3 (ESPHome)",
+        "description": "Select the ESPHome node that will be used to wake this console.",
+        "data": {
+          "wakepsx_on_bt_entity": "ESPHome Node"
+        }
+      },
+      "select_esp_warning": {
+        "title": "Wake PSX on Bluetooth - Step 3 (ESPHome)",
+        "description": "⚠️ **Warning: No compatible ESPHome node found.**\n\nYou can leave this field empty to finish the installation and link the node later via the Configure menu.",
+        "data": {
+          "wakepsx_on_bt_entity": "ESPHome Node (Optional)"
+        }
+      },
+      "select_dongle": {
+        "title": "Wake PSX on Bluetooth - Step 3 (Bluetooth Dongle)",
+        "description": "Select a compatible local Bluetooth adapter that will send wake packets directly.",
+        "data": {
+          "bt_adapter": "Bluetooth Adapter"
+        }
+      },
+      "select_dongle_warning": {
+        "title": "Wake PSX on Bluetooth - Step 3 (Bluetooth Dongle)",
+        "description": "⚠️ **Warning: No compatible adapter could be auto-detected.**\n\nEnter the adapter manually using the format `hciX` (example: `hci0`).",
+        "data": {
+          "bt_adapter": "Bluetooth Adapter"
+        }
+      },
+      "select_csr_write_mode": {
+        "title": "Wake PSX on Bluetooth - Step 4 (CSR Dongle)",
+        "description": "CSR adapter detected. Choose how the BD_ADDR is written before each wake command.\n\n- **Transient (recommended):** written to RAM only. The software always restores the original address after use. If the process crashes, simply unplugging and replugging the dongle recovers it automatically.\n- **Persistent:** written to flash. The software still restores after use, but if the process crashes, the flash retains the wrong address until the next run.",
+        "data": {
+          "csr_write_mode": "CSR Write Mode"
+        }
+      }
+    },
+    "error": {
+      "no_controller": "No compatible PlayStation controller found on USB. Please reconnect and try again.",
+      "extraction_error": "An error occurred while reading the USB device. Check your system logs.",
+      "invalid_wake_method": "Invalid wake method selected.",
+      "invalid_adapter": "Invalid Bluetooth adapter format. Use hciX (example: hci0).",
+      "adapter_already_configured": "The selected Bluetooth adapter is already configured for another console.",
+      "adapter_not_found": "The selected Bluetooth adapter was not detected on this system.",
+      "detection_error": "Failed to detect the adapter strategy. Check that the adapter is connected and that Home Assistant has access to Bluetooth devices.",
+      "no_esphome_found": "No compatible ESPHome node found. Make sure a node running the WakePSX firmware is online and reachable from Home Assistant.",
+      "no_adapter_found": "No Bluetooth adapter detected on this system. Please connect a USB Bluetooth dongle and try again."
+    },
+    "abort": {
+      "already_configured": "This console is already configured.",
+      "extraction_error": "An internal error occurred during configuration. Please restart the setup.",
+      "reconfigure_successful": "The console configuration has been updated successfully."
+    }
+  },
+  "selector": {
+    "wake_method": {
+      "options": {
+        "esphome_psx_waker": "ESPHome (Recommended)",
+        "bluetooth_dongle": "Bluetooth Dongle"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Reconfigure Wake Method",
+        "description": "Detected: **ESPHome** — {esp_summary} | **Bluetooth** — {adapter_summary}\n\nSelect which wake method should be used for this console.",
+        "data": {
+          "wake_method": "Wake Method"
+        }
+      },
+      "init_esphome": {
+        "title": "Reconfigure ESP Node",
+        "description": "Select the ESPHome node used for wake commands.",
+        "data": {
+          "wakepsx_on_bt_entity": "ESPHome Node"
+        }
+      },
+      "init_esphome_warning": {
+        "title": "Reconfigure ESP Node",
+        "description": "⚠️ **Warning: No compatible ESPHome node found.**\n\nYou can leave this field empty to finish the configuration and link the node later via the Configure menu.",
+        "data": {
+          "wakepsx_on_bt_entity": "ESPHome Node (Optional)"
+        }
+      },
+      "init_dongle": {
+        "title": "Reconfigure Bluetooth Dongle",
+        "description": "Select the local Bluetooth adapter used for direct wake commands.",
+        "data": {
+          "bt_adapter": "Bluetooth Adapter"
+        }
+      },
+      "init_dongle_warning": {
+        "title": "Reconfigure Bluetooth Dongle",
+        "description": "⚠️ **Warning: No compatible adapter could be auto-detected.**\n\nEnter the adapter manually using the format `hciX` (example: `hci0`).",
+        "data": {
+          "bt_adapter": "Bluetooth Adapter"
+        }
+      },
+      "init_csr_write_mode": {
+        "title": "Reconfigure CSR Write Mode",
+        "description": "Choose how the CSR adapter writes the BD_ADDR before each wake command.\n\n- **Transient (recommended):** written to RAM only. The software always restores the original address after use. If the process crashes, simply unplugging and replugging the dongle recovers it automatically.\n- **Persistent:** written to flash. The software still restores after use, but if the process crashes, the flash retains the wrong address until the next run.",
+        "data": {
+          "csr_write_mode": "CSR Write Mode"
+        }
+      }
+    }
+  }
+}
