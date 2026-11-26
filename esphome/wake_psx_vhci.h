@@ -356,12 +356,15 @@ static void wake_task(void *pvParameters) {
  */
 static void wake_psx(const std::string &dsx_mac, const std::string &psx_mac, esphome::text_sensor::TextSensor *sensor) {
   if (wake_mutex == nullptr) {
-    wake_mutex = xSemaphoreCreateMutex();
+    // Binary semaphore, not a mutex: it is taken here (API task) and given back from wake_task.
+    // A FreeRTOS mutex must be released by its holder, otherwise xTaskPriorityDisinherit asserts.
+    wake_mutex = xSemaphoreCreateBinary();
     if (wake_mutex == nullptr) {
       ESP_LOGE(TAG, "Failed to create wake mutex");
       publish_status(sensor, "Task Error");
       return;
     }
+    xSemaphoreGive(wake_mutex);
   }
 
   if (xSemaphoreTake(wake_mutex, 0) != pdTRUE) {
