@@ -6,3 +6,6 @@ __pycache__/
 # ESPHome build artifacts
 esphome/.esphome/
 .claude/
+
+# Local Python virtual environments
+.venv/

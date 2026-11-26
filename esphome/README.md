@@ -122,7 +122,7 @@ The firmware disables the full Bluetooth host stack (Bluedroid and NimBLE) and u
 ESPHome YAML lambda
         │
         ▼
-wakepsx_on_bt::wake_psx()     ← API entry point, mutex guard
+wakepsx_on_bt::wake_psx()     ← API entry point, semaphore guard
         │
         ▼
 FreeRTOS task: wake_task()    ← runs on APP_CPU, stack 4096 words (16 KB)
@@ -154,7 +154,7 @@ Ref: Bluetooth Core Spec Vol 4 Part E §7.1.5.
 
 ### Concurrency
 
-A FreeRTOS mutex prevents concurrent wake attempts. A second call while a wake is in progress returns `Busy` immediately. The mutex is released 5 seconds after the result is published (while the status is displayed), so rapid retries within that window are also blocked.
+A FreeRTOS binary semaphore prevents concurrent wake attempts. A second call while a wake is in progress returns `Busy` immediately. The semaphore is taken in the API task and given back by the wake task, which a mutex does not allow (a mutex must be released by the task that took it). It is released 5 seconds after the result is published (while the status is displayed), so rapid retries within that window are also blocked.
 
 ### Timing Constants
 
