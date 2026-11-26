@@ -32,6 +32,12 @@ esp32:
   framework:
     type: esp-idf
     version: recommended
+    # ESPHome >= 2026.x excludes the IDF "bt" component unless an ESPHome BLE
+    # component requests it. We drive the controller directly via VHCI, so
+    # re-include it explicitly (otherwise esp_bt.h is not found).
+    advanced:
+      include_builtin_idf_components:
+        - bt
     # Core optimization: We disable high-level Bluetooth stacks (Bluedroid/NimBLE)
     # to free up RAM and allow raw Virtual HCI (VHCI) injection.
     sdkconfig_options:
