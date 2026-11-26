@@ -177,3 +177,17 @@ A FreeRTOS mutex prevents concurrent wake attempts. A second call while a wake i
 | `CONFIG_BT_NIMBLE_ENABLED` | n | Disabled — not needed, saves RAM |
 | `CONFIG_BT_HCI_MODE_VHCI` | y | Route HCI over Virtual HCI interface |
 | `CONFIG_BTDM_CTRL_MODE_BR_EDR_ONLY` | y | Classic BT only — disables BLE hardware to save RAM |
+
+### IDF Components
+
+ESPHome only builds the ESP-IDF components its own components request. The `bt` component is normally
+requested by `esp32_ble`, which this firmware does not use (it drives the controller directly via VHCI).
+It is therefore re-included explicitly:
+
+```yaml
+esp32:
+  framework:
+    advanced:
+      include_builtin_idf_components:
+        - bt
+```
