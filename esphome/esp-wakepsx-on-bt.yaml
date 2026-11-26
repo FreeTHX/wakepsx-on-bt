@@ -9,7 +9,7 @@ esphome:
   friendly_name: Wake PSX on Bluetooth
   project:
     name: "freethx.esp-wakepsx-on-bt"
-    version: "0.1.0"
+    version: "0.2.0"
   includes:
     - wake_psx_vhci.h
   # Set status to Ready before API connects so HA never sees "unknown" on boot

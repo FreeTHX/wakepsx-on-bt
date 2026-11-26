@@ -66,14 +66,14 @@ static constexpr uint16_t HCI_BR_PACKET_TYPE = 0xCC18;
 // volatile alone does not guarantee cross-core memory coherence on the dual-core ESP32.
 // inline (C++17) gives a single definition across all translation units.
 inline std::atomic<int> connection_status{-1};
-// wake_mutex is created once in wake_psx() and never destroyed — intentional.
+// wake_lock is created once in wake_psx() and never destroyed — intentional.
 // Its lifetime matches the device lifetime: OTA updates trigger a full reboot,
 // so vSemaphoreDelete() is never needed and would only add dead code.
-inline SemaphoreHandle_t wake_mutex = nullptr;
+inline SemaphoreHandle_t wake_lock = nullptr;
 
 // Target PSX MAC in little-endian byte order, set by wake_task before packet injection
 // and read by notify_host_recv to filter Connection Complete events from other devices.
-// Written once before the callback window; no concurrent writes possible (mutex-protected).
+// Written once before the callback window; no concurrent writes possible (guarded by wake_lock).
 inline uint8_t g_psx_le[6] = {0};
 
 // Callback triggered when the BT controller sends an HCI event packet back to the host.
@@ -182,9 +182,9 @@ static void cleanup_bt_controller() {
   }
 }
 
-static void release_wake_mutex() {
-  if (wake_mutex != nullptr) {
-    xSemaphoreGive(wake_mutex);
+static void release_wake_lock() {
+  if (wake_lock != nullptr) {
+    xSemaphoreGive(wake_lock);
   }
 }
 
@@ -203,7 +203,7 @@ static void wake_task(void *pvParameters) {
       publish_status(params->status_sensor_, "Ready");
     }
 
-    release_wake_mutex();
+    release_wake_lock();
     delete params;
     vTaskDelete(nullptr);
   };
@@ -341,7 +341,7 @@ static void wake_task(void *pvParameters) {
  * the console. The result is published to @p sensor as a human-readable string
  * ("Success", "Page Timeout", "No Response", "Busy", or an error label).
  *
- * Re-entrant-safe: a lazily-initialised mutex prevents concurrent executions.
+ * Re-entrant-safe: a lazily-initialised binary semaphore prevents concurrent executions.
  * A second call while a wake sequence is in progress immediately publishes
  * "Busy" and returns without touching the hardware.
  *
@@ -355,26 +355,26 @@ static void wake_task(void *pvParameters) {
  *                 (updates are silently skipped).
  */
 static void wake_psx(const std::string &dsx_mac, const std::string &psx_mac, esphome::text_sensor::TextSensor *sensor) {
-  if (wake_mutex == nullptr) {
+  if (wake_lock == nullptr) {
     // Binary semaphore, not a mutex: it is taken here (API task) and given back from wake_task.
     // A FreeRTOS mutex must be released by its holder, otherwise xTaskPriorityDisinherit asserts.
-    wake_mutex = xSemaphoreCreateBinary();
-    if (wake_mutex == nullptr) {
-      ESP_LOGE(TAG, "Failed to create wake mutex");
+    wake_lock = xSemaphoreCreateBinary();
+    if (wake_lock == nullptr) {
+      ESP_LOGE(TAG, "Failed to create wake semaphore");
       publish_status(sensor, "Task Error");
       return;
     }
-    xSemaphoreGive(wake_mutex);
+    xSemaphoreGive(wake_lock);
   }
 
-  if (xSemaphoreTake(wake_mutex, 0) != pdTRUE) {
+  if (xSemaphoreTake(wake_lock, 0) != pdTRUE) {
     publish_status(sensor, "Busy");
     return;
   }
 
   // Heap allocation is intentional and unavoidable here: xTaskCreate() allocates 4096 bytes of task
   // stack on the heap anyway, making the struct allocation negligible by comparison. A static buffer
-  // would be unsafe without additional synchronization beyond the mutex, and this function is called
+  // would be unsafe without additional synchronization beyond wake_lock, and this function is called
   // at most a few times per day, so fragmentation risk is nil.
   WakeTaskParams *p = new WakeTaskParams{dsx_mac, psx_mac, sensor};
 
@@ -385,7 +385,7 @@ static void wake_psx(const std::string &dsx_mac, const std::string &psx_mac, esp
     ESP_LOGE(TAG, "Failed to create wake task");
     publish_status(sensor, "Task Error");
     delete p;
-    release_wake_mutex();
+    release_wake_lock();
   }
 }
 }  // namespace wakepsx_on_bt
